@@ -1,0 +1,155 @@
+<sdf version='1.9'>
+  <world name='droneworld'>
+    <!-- Physics and gravity -->
+    <physics name="default_physics" type="ode">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+    <gravity>0 0 -9.8</gravity>
+
+    <!-- Static wind baseline (required for Gazebo) -->
+    <wind>
+      <linear_velocity>3.0 1.5 0</linear_velocity>
+    </wind>
+
+    <!-- Magnetisch veld -->
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+
+    <!-- Scene with blue background (no problematic sky element) -->
+    <scene>
+      <grid>false</grid>
+      <ambient>0.8 0.8 0.8 1</ambient>
+      <background>0.5 0.7 1.0 1</background>
+      <shadows>true</shadows>
+    </scene>
+
+    <!-- Ground plane (neutral grey, no pattern) -->
+    <model name='ground_plane'>
+      <static>true</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>1 1</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100000 100000</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>1.0 1.0 1.0 1.0</ambient>
+            <diffuse>1.0 1.0 1.0 1.0</diffuse>
+            <specular>0.1 0.1 0.1 1.0</specular>
+            <emissive>0.0 0.0 0.0 1.0</emissive>
+            <pbr>
+              <metal>
+                <albedo_map>/home/ubuntu/mindef-workspace/ros2_ws/src/simulatie/PX4-Autopilot/Tools/simulation/gz/media/materials/textures/map.png</albedo_map>
+              </metal>
+            </pbr>
+          </material>
+        </visual>
+        <pose>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 -0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>true</enable_wind>
+      </link>
+      <pose>0 0 0 0 -0 0</pose>
+      <self_collide>false</self_collide>
+    </model>
+
+    <!-- Red landing box (visual only, no collision) -->
+    <model name="landing_box">
+      <static>true</static>
+      <link name="box_link">
+        <visual name="box_visual">
+          <geometry>
+            <box>
+              <size>3 3 0.01</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0 0 1</ambient>
+            <diffuse>1 0 0 1</diffuse>
+            <specular>0.2 0 0 1</specular>
+          </material>
+        </visual>
+        <pose>0 0 0.005 0 0 0</pose> <!-- Center at (0,5,0), just above ground -->
+      </link>
+      <pose>0 0 0 0 0 0</pose>
+      <self_collide>false</self_collide>
+    </model>
+
+    <!-- Zonlicht -->
+    <light name='sunUTC' type='directional'>
+      <pose>0 0 500 0 -0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1</intensity>
+      <direction>0.001 0.625 -0.78</direction>
+      <diffuse>0.904 0.904 0.904 1</diffuse>
+      <specular>0.271 0.271 0.271 1</specular>
+      <attenuation>
+        <range>2000</range>
+        <linear>0</linear>
+        <constant>1</constant>
+        <quadratic>0</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+
+
+    <!-- Sferische coördinaten: realistisch voor Amsterdam, nederland -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>52.370216</latitude_deg>
+      <longitude_deg>4.895168</longitude_deg>
+      <elevation>0</elevation>
+    </spherical_coordinates>
+
+   
+    <model name="wind_system">
+      <static>true</static>
+      <link name="wind_link"/>
+      <plugin filename="libWindPlugin.so" name="gz::sim::v8::systems::WindPlugin">
+        <wind_velocity_mean>3.0 1.5 0</wind_velocity_mean>
+        <wind_gust_amplitude>3.0</wind_gust_amplitude>
+        <wind_gust_frequency>0.15</wind_gust_frequency>
+        <wind_gust_decay_time>3.0</wind_gust_decay_time>
+        <wind_turbulence_amplitude>0.5</wind_turbulence_amplitude>
+        <wind_vertical_gust_amplitude>0.3</wind_vertical_gust_amplitude>
+        <drag_cda>0.06</drag_cda>
+        <max_force>50.0</max_force>
+        <target_model>evo_tactical</target_model>
+      </plugin>
+    </model>
+
+  </world>
+</sdf>
